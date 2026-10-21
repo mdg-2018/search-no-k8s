@@ -1,0 +1,35 @@
+syncSource:
+   replicaSet:
+      hostAndPort: 
+        - "localhost:27017"
+        - "localhost:27018"
+        - "localhost:27019"
+      scramAuth:
+         username: mongotUser
+         authSource: admin
+         passwordFile: "./data/mongot_passwordfile"
+         tls:
+            enabled: false
+   router:
+     hostAndPort:
+       - "localhost:27020"
+     scramAuth:
+        username: mongotUser
+        authSource: admin
+        passwordFile: "./data/mongot_passwordfile"
+        tls:
+           enabled: false
+storage:
+   dataPath: "./data/shard1/mongot2" # CHANGE ME!
+server:
+  grpc:
+    address: "localhost:27029"
+    tls:
+        mode: "disabled"
+metrics:
+   enabled: true
+   address: "localhost:9947"
+healthCheck:
+   address: "localhost:8081"
+logging:
+   verbosity: INFO

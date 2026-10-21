@@ -1,0 +1,4 @@
+mongot.tar.gz
+mongot-community
+replica_set_plus_search/data/*
+sharded_cluster_plus_search/data/*
