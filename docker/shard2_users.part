@@ -1,0 +1,19 @@
+# Create the same users on shard 2 so its mongots can authenticate directly.
+mongosh --port 27007 <<'EOF'
+db.getSiblingDB("admin").createUser({
+  user: "admin",
+  pwd: "password",
+  roles: [ { role: "root", db: "admin" } ]
+})
+exit()
+EOF
+
+mongosh --port 27007 -u admin -p password --authenticationDatabase "admin" <<'EOF'
+db.getSiblingDB("admin").createUser({
+  user: "mongotUser",
+  pwd: "searchpass",
+  roles: [ { role: "searchCoordinator", db: "admin" } ]
+})
+exit()
+EOF
+

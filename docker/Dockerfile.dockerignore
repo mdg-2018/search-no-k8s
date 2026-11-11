@@ -1,0 +1,6 @@
+.git
+.gitignore
+mongot.tar.gz
+mongot-community
+**/data
+README.md

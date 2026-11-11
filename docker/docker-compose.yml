@@ -1,0 +1,32 @@
+services:
+  search:
+    build:
+      # The image copies replica_set_plus_search/ and sharded_cluster_plus_search/,
+      # so the build context is the repo root even though this file lives in docker/.
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: search-no-k8s:latest
+    container_name: search-no-k8s
+    # replica_set (default) or sharded_cluster
+    environment:
+      TOPOLOGY: ${TOPOLOGY:-replica_set}
+    ports:
+      - "27017:27017"   # mongod / shard 1 primary
+      - "27018:27018"
+      - "27019:27019"
+      - "27020:27020"   # mongos (sharded_cluster only)
+      - "27030:27030"   # haproxy -> mongot gRPC
+      - "27031:27031"   # haproxy shard 2 (sharded_cluster only)
+    volumes:
+      - rs_data:/opt/search-no-k8s/replica_set_plus_search/data
+      - sharded_data:/opt/search-no-k8s/sharded_cluster_plus_search/data
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+    # 6 mongods + 4 mongot JVMs in the sharded topology; raise if it OOMs.
+    mem_limit: 12g
+
+volumes:
+  rs_data:
+  sharded_data:

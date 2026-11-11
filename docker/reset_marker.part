@@ -1,0 +1,4 @@
+
+# Added for the container: entrypoint.sh re-runs setup_mongod.sh when this
+# marker is absent, so a reset must clear it too.
+rm -f "$DATA_PATH_ROOT"/.initialized
