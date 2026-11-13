@@ -1,0 +1,46 @@
+# mongot configuration for the single-node POC.
+#
+# Everything is 127.0.0.1 because mongod and mongot share a host. Note the
+# literal 127.0.0.1 rather than "localhost": on a dual-stack host "localhost"
+# can resolve to ::1 for one process and 127.0.0.1 for the other, which is the
+# single most common reason mongod cannot reach mongot.
+
+# Where mongot reads data FROM. It opens a change stream against the replica
+# set and builds its indexes from that, so the source must be a replica set -
+# a standalone mongod cannot be a sync source.
+syncSource:
+  replicaSet:
+    hostAndPort:
+      - "127.0.0.1:27017"
+    # mongot authenticates to mongod as a normal SCRAM user. This user needs
+    # the built-in searchCoordinator role on admin.
+    scramAuth:
+      username: mongotUser
+      authSource: admin
+      passwordFile: "/data/mongot.pwd"
+      tls:
+        enabled: false
+
+# Where mongot keeps the indexes it builds. This is mongot's own storage and
+# is entirely separate from mongod's dbpath.
+storage:
+  dataPath: "/data/mongot"
+
+# Where mongot listens for mongod. mongod connects here for both index
+# management (createSearchIndex) and queries ($search / $vectorSearch),
+# over gRPC. Bound to loopback: nothing outside this host should reach it.
+server:
+  grpc:
+    address: "127.0.0.1:27028"
+    tls:
+      mode: "disabled"
+
+# Bound to 0.0.0.0 only so you can curl them from your laptop.
+metrics:
+  enabled: true
+  address: "0.0.0.0:9946"
+healthCheck:
+  address: "0.0.0.0:8080"
+
+logging:
+  verbosity: INFO

@@ -1,0 +1,22 @@
+services:
+  mongot-simple:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mongot-simple:latest
+    container_name: mongot-simple
+    ports:
+      - "27017:27017"   # mongod
+      - "8080:8080"     # mongot health check
+      - "9946:9946"     # mongot Prometheus metrics
+    volumes:
+      - data:/data
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+    # mongot is a JVM and wants room to build indexes.
+    mem_limit: 4g
+
+volumes:
+  data:
